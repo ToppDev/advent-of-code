@@ -9,7 +9,7 @@ edition = "2021"
 itertools = { workspace = true }
 
 [dev-dependencies]
-divan = { workspace = true }
+criterion = { workspace = true }
 
 [[bench]]
 name = "day-01"
