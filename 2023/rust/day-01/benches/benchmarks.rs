@@ -5,6 +5,9 @@ fn part1(c: &mut Criterion) {
     c.bench_function("part1", |b| {
         b.iter(|| part1::process(black_box(include_str!("../input1.txt"))))
     });
+    c.bench_function("part1_iter", |b| {
+        b.iter(|| part1::process_iterator(black_box(include_str!("../input1.txt"))))
+    });
 }
 
 fn part2(c: &mut Criterion) {
