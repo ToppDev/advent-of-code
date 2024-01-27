@@ -62,6 +62,8 @@ zoneight234
     #[case("4nineeightseven2", 42)]
     #[case("zoneight234", 14)]
     #[case("7pqrstsixteen", 76)]
+    // Test cases taken from 'input2.txt'.
+    // Numbers are overlapping and appearing after first digit
     #[case("kvskplbpgfninesixvzkrv1fqnrjnrhvnpkpkhph27twonemv", 91)]
     #[case("zkrv1fqnrjnrhvnpkpkhph27twonemv", 11)]
     fn line_test(#[case] line: &str, #[case] expected: u32) {

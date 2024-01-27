@@ -4,10 +4,16 @@
       pkg-config
     ];
     buildInputs = with pkgs; [
+      just
       clang
       llvmPackages.bintools
       rustup
       lld
+
+      cargo-watch
+      cargo-generate
+      cargo-flamegraph
+      cargo-nextest
 
       # libGL libGLU # OpenGL
       # vulkan-loader # Vulkan
