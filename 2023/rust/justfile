@@ -12,7 +12,7 @@ bench-all:
     cargo bench -q > benchmarks.txt
 # Benchmark a specifiv day and part
 bench day part:
-    cargo bench --bench {{day}}-bench {{part}} | tee {{day}}.bench.txt
+    cargo bench --bench {{day}}-bench {{part}}
 # Create a flamegraph for a specific day and part
 flamegraph day part:
     cargo flamegraph --profile flamegraph --root --package {{day}} --bin {{part}} -o flamegraphs/{{day}}--{{part}}.svg

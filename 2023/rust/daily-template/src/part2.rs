@@ -2,8 +2,14 @@ pub fn process(input: &str) -> String {
     todo!("{{crate_name}} - part 2")
 }
 
+fn process_line(line: &str) -> u32 {
+    todo!("{{crate_name}} - part 2 process_line")
+}
+
 #[cfg(test)]
 mod tests {
+    use rstest::rstest;
+
     use super::*;
 
     #[test]

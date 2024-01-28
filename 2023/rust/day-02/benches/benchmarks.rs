@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use {{crate_name}}::*;
+use day_02::*;
 
 fn part1(c: &mut Criterion) {
     c.bench_function("part1", |b| {
