@@ -7,13 +7,18 @@ edition = "2021"
 
 [dependencies]
 itertools.workspace = true
+dhat.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true
 indoc.workspace = true
 rstest.workspace = true
+dhat.workspace = true
 
 [[bench]]
 name = "{{project-name}}-bench"
 path = "benches/benchmarks.rs"
 harness = false
+
+[features]
+dhat-heap = []

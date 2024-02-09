@@ -1,50 +1,45 @@
+use std::ops::{Shl, Shr};
+
 use nom::{
-    bytes::complete::tag,
-    character::complete::multispace1,
-    character::complete::{digit0, u32},
-    multi::separated_list0,
-    IResult,
+    bytes::complete::tag, character::complete::space1, character::complete::u32,
+    multi::separated_list0, IResult,
 };
 
 pub fn process(input: &str) -> String {
-    todo!("day_04 - part 1")
+    input.lines().map(process_line).sum::<u32>().to_string()
 }
 
 fn process_line(line: &str) -> u32 {
-    println!("Input line: {line}");
-    let _ = parse_line(line).unwrap();
+    let line = parse_line(line).unwrap().1;
 
-    0
+    let num_winning_found = line
+        .winning_nums
+        .iter()
+        .filter(|x| line.numbers.contains(x))
+        .count() as u32;
+
+    1u32.shl(num_winning_found).shr(1)
 }
 
-#[derive(Debug)]
 struct Line {
-    card_num: u32,
     winning_nums: Vec<u32>,
     numbers: Vec<u32>,
 }
 
 fn parse_line(input: &str) -> IResult<&str, Line> {
-    let (remainder, _) = tag("Card")(input)?;
-    let (remainder, _) = multispace1(remainder)?;
-    let (remainder, card_num) = u32(remainder)?;
-    println!("Card number: {card_num}");
+    let (remainder, _) = space1(&input[4..])?; // "Card"
+    let (remainder, _) = u32(remainder)?;
     let (remainder, _) = tag(":")(remainder)?;
-    let (remainder, _) = multispace1(remainder)?;
+    let (remainder, _) = space1(remainder)?;
     let (remainder, winning_nums) = separated_list0(space1, u32)(remainder)?;
-    println!("Winning numbers: {winning_nums:?}");
-    let (remainder, _) = multispace1(remainder)?;
+    let (remainder, _) = space1(remainder)?;
     let (remainder, _) = tag("|")(remainder)?;
-    let (remainder, _) = multispace1(remainder)?;
-    println!("{remainder}");
-    let (remainder, numbers) = separated_list0(space1, digit0)(remainder)?;
-    println!("Numbers: {numbers:?}");
-    println!("{remainder}");
+    let (remainder, _) = space1(remainder)?;
+    let (remainder, numbers) = separated_list0(space1, u32)(remainder)?;
 
     Ok((
         remainder,
         Line {
-            card_num,
             winning_nums,
             numbers,
         },
@@ -68,7 +63,7 @@ mod tests {
             Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
             Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
         "#};
-        assert_eq!(process(input), "");
+        assert_eq!(process(input), "13");
     }
 
     #[rstest]
