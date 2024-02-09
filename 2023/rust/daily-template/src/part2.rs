@@ -8,6 +8,7 @@ fn process_line(line: &str) -> u32 {
 
 #[cfg(test)]
 mod tests {
+    use indoc::indoc;
     use rstest::rstest;
 
     use super::*;
@@ -15,7 +16,9 @@ mod tests {
     #[test]
     fn test_process() {
         todo!("Test data missing");
-        let input = "";
+        let input = indoc! {r#"
+        "#};
+
         assert_eq!(process(input), "");
     }
 
