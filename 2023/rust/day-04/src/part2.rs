@@ -3,12 +3,28 @@ use nom::{
     multi::separated_list0, IResult,
 };
 
+#[derive(Debug)]
+struct Card {
+    winning_nums: Vec<u32>,
+    numbers: Vec<u32>,
+}
+
+impl Card {
+    fn score(&self) -> usize {
+        self.winning_nums
+            .iter()
+            .filter(|x| self.numbers.contains(x))
+            .count()
+    }
+}
+
 pub fn process(input: &str) -> String {
     let mut scratchcards: Vec<u32> = vec![0; input.lines().count()];
 
     for (i, line) in input.lines().enumerate() {
         scratchcards[i] += 1;
-        let matches = count_matching_nums(line);
+        let card = parse_line(line).unwrap().1;
+        let matches = card.score();
         for j in 1..=matches {
             scratchcards[i + j] += scratchcards[i];
         }
@@ -16,22 +32,7 @@ pub fn process(input: &str) -> String {
     scratchcards.iter().sum::<u32>().to_string()
 }
 
-fn count_matching_nums(line: &str) -> usize {
-    let line = parse_line(line).unwrap().1;
-
-    line.winning_nums
-        .iter()
-        .filter(|x| line.numbers.contains(x))
-        .count()
-}
-
-#[derive(Debug)]
-struct Numbers {
-    winning_nums: Vec<u32>,
-    numbers: Vec<u32>,
-}
-
-fn parse_line(input: &str) -> IResult<&str, Numbers> {
+fn parse_line(input: &str) -> IResult<&str, Card> {
     let (remainder, _) = space1(&input[4..])?; // "Card"
     let (remainder, _) = u32(remainder)?;
     let (remainder, _) = tag(":")(remainder)?;
@@ -44,7 +45,7 @@ fn parse_line(input: &str) -> IResult<&str, Numbers> {
 
     Ok((
         remainder,
-        Numbers {
+        Card {
             winning_nums,
             numbers,
         },
