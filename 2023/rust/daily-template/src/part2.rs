@@ -1,4 +1,5 @@
-pub fn process(input: &str) -> String {
+#[tracing::instrument]
+pub fn process(_input: &str) -> miette::Result<String, ()> {
     todo!("{{crate_name}} - part 2")
 }
 
@@ -14,12 +15,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_process() {
-        todo!("Test data missing");
+    fn test_process() -> miette::Result<()> {
+        todo!("Test not yet written");
         let input = indoc! {r#"
         "#};
 
         assert_eq!(process(input), "");
+        Ok(())
     }
 
     #[rstest]
