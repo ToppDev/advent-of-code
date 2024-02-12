@@ -1,9 +1,11 @@
+use crate::custom_error::AocError;
+
 #[tracing::instrument]
 pub fn process(_input: &str) -> miette::Result<String, ()> {
     todo!("{{crate_name}} - part 1")
 }
 
-fn process_line(line: &str) -> u32 {
+fn process_line(_line: &str) -> u32 {
     todo!("{{crate_name}} - part 1 process_line")
 }
 
@@ -20,7 +22,7 @@ mod tests {
         let input = indoc! {r#"
         "#};
 
-        assert_eq!(process(input), "");
+        assert_eq!(process(input)?, "");
         Ok(())
     }
 

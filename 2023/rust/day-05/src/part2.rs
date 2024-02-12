@@ -1,12 +1,12 @@
 use crate::custom_error::AocError;
 
 #[tracing::instrument]
-pub fn process(_input: &str) -> miette::Result<String, ()> {
-    todo!("{{crate_name}} - part 2")
+pub fn process(_input: &str) -> miette::Result<String, AocError> {
+    todo!("day_05 - part 2")
 }
 
 fn process_line(_line: &str) -> u32 {
-    todo!("{{crate_name}} - part 2 process_line")
+    todo!("day_05 - part 2 process_line")
 }
 
 #[cfg(test)]
