@@ -1,34 +1,107 @@
-use crate::custom_error::AocError;
+use indicatif::{ParallelProgressIterator, ProgressIterator, ProgressStyle};
+use nom::{
+    character::complete::{self, newline, space1},
+    multi::separated_list1,
+    sequence::{pair, separated_pair},
+    IResult, Parser,
+};
+use nom_supreme::{tag::complete::tag, ParserExt};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
+
+use crate::{custom_error::AocError, maps};
 
 #[tracing::instrument]
-pub fn process(_input: &str) -> miette::Result<String, AocError> {
-    todo!("day_05 - part 2")
+fn seeds(input: &str) -> IResult<&str, Vec<(u64, u64)>> {
+    tag("seeds: ")
+        .precedes(separated_list1(
+            space1,
+            separated_pair(complete::u64, space1, complete::u64),
+        ))
+        .parse(input)
 }
 
-fn process_line(_line: &str) -> u32 {
-    todo!("day_05 - part 2 process_line")
+#[tracing::instrument]
+pub fn process(input: &str) -> miette::Result<String, AocError> {
+    let (remaining, seeds) = seeds.parse(input).unwrap();
+    let seeds: Vec<_> = seeds
+        .iter()
+        .progress()
+        .with_message("Collecting Seeds")
+        .with_style(
+            ProgressStyle::with_template(
+                "[{elapsed_precise}] {wide_bar} {pos}/{len} {msg}",
+            )
+            .unwrap(),
+        )
+        .with_finish(indicatif::ProgressFinish::Abandon)
+        .flat_map(|(start, amount)| (*start..*start + *amount))
+        .collect();
+    let collection = maps
+        .preceded_by(pair(newline, newline))
+        .parse(remaining)
+        .unwrap()
+        .1;
+    let minimum_location = seeds
+        .into_par_iter()
+        .progress()
+        .with_message("Calculating Locations")
+        .with_style(
+            ProgressStyle::with_template(
+                "[{elapsed_precise}/{duration_precise}] {wide_bar} {pos}/{len} {msg}",
+            )
+            .unwrap(),
+        )
+        .with_finish(indicatif::ProgressFinish::Abandon)
+        .map(|s| collection.map_to_dest(s))
+        .min();
+    Ok(minimum_location.unwrap().to_string())
 }
 
 #[cfg(test)]
 mod tests {
     use indoc::indoc;
-    use rstest::rstest;
 
     use super::*;
 
     #[test]
     fn test_process() -> miette::Result<()> {
-        todo!("Test not yet written");
         let input = indoc! {r#"
+          seeds: 79 14 55 13
+
+          seed-to-soil map:
+          50 98 2
+          52 50 48
+
+          soil-to-fertilizer map:
+          0 15 37
+          37 52 2
+          39 0 15
+
+          fertilizer-to-water map:
+          49 53 8
+          0 11 42
+          42 0 7
+          57 7 4
+
+          water-to-light map:
+          88 18 7
+          18 25 70
+
+          light-to-temperature map:
+          45 77 23
+          81 45 19
+          68 64 13
+
+          temperature-to-humidity map:
+          0 69 1
+          1 0 69
+
+          humidity-to-location map:
+          60 56 37
+          56 93 4
         "#};
 
-        assert_eq!(process(input)?, "");
+        assert_eq!(process(input)?, "46");
         Ok(())
-    }
-
-    #[rstest]
-    #[case("", 0)]
-    fn line_test(#[case] line: &str, #[case] expected: u32) {
-        assert_eq!(process_line(line), expected)
     }
 }

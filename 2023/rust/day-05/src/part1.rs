@@ -1,33 +1,48 @@
-use crate::custom_error::AocError;
+use nom::{
+    character::complete::{self, newline, space1},
+    multi::separated_list1,
+    sequence::pair,
+    IResult, Parser,
+};
+use nom_supreme::{tag::complete::tag, ParserExt};
+use tracing::info;
 
-struct Map<'a> {
-    from: &'a str,
-    to: &'a str,
-    src: u32,
-    dest: u32,
-    amount: u32,
+use crate::{custom_error::AocError, maps};
+
+#[tracing::instrument()]
+fn seeds(input: &str) -> IResult<&str, Vec<u64>> {
+    tag("seeds: ")
+        .precedes(separated_list1(space1, complete::u64))
+        .parse(input)
 }
 
-impl<'a> Map<'a> {
-    fn map_to_dest(&self) -> u32 {
-        unimplemented!();
-    }
-}
-
-struct MapCollection<'a>(Vec<Map<'a>>);
-
-#[tracing::instrument]
-pub fn process(_input: &str) -> miette::Result<String, AocError> {
-    todo!("day_05 - part 1")
+#[tracing::instrument(skip(input), fields(input_first_line = input.lines().next().unwrap()))]
+pub fn process(input: &str) -> miette::Result<String, AocError> {
+    let (remaining, seeds) = seeds.parse(input).unwrap();
+    info!(?seeds);
+    let collection = maps
+        .preceded_by(pair(newline, newline))
+        .parse(remaining)
+        .unwrap()
+        .1;
+    Ok(seeds
+        .iter()
+        .map(|s| collection.map_to_dest(*s))
+        .min()
+        .unwrap()
+        .to_string())
 }
 
 #[cfg(test)]
 mod tests {
     use indoc::indoc;
+    use rstest::{fixture, rstest};
+
+    use crate::{Entry, Map, MapCollection};
 
     use super::*;
 
-    #[test]
+    #[test_log::test]
     fn test_process() -> miette::Result<()> {
         let input = indoc! {r#"
           seeds: 79 14 55 13
@@ -65,7 +80,80 @@ mod tests {
           56 93 4
         "#};
 
-        assert_eq!(process(input)?, "");
+        assert_eq!(process(input)?, "35");
         Ok(())
+    }
+
+    #[fixture]
+    fn seed_to_soil() -> Map {
+        Map(vec![
+            Entry {
+                dest: 50,
+                src: 98,
+                amount: 2,
+            },
+            Entry {
+                dest: 52,
+                src: 50,
+                amount: 48,
+            },
+        ])
+    }
+
+    #[rstest]
+    #[case(98, 50)]
+    #[case(99, 51)]
+    #[case(49, 49)]
+    #[case(100, 100)]
+    #[case(50, 52)]
+    #[case(97, 99)]
+    fn map_test(seed_to_soil: Map, #[case] input: u64, #[case] expected: u64) {
+        assert_eq!(seed_to_soil.calc_dest(input), expected)
+    }
+
+    #[fixture]
+    fn seed_to_soil_to_fertilizer() -> MapCollection {
+        MapCollection(vec![
+            Map(vec![
+                Entry {
+                    dest: 50,
+                    src: 98,
+                    amount: 2,
+                },
+                Entry {
+                    dest: 52,
+                    src: 50,
+                    amount: 48,
+                },
+            ]),
+            Map(vec![
+                Entry {
+                    dest: 0,
+                    src: 15,
+                    amount: 37,
+                },
+                Entry {
+                    dest: 37,
+                    src: 52,
+                    amount: 2,
+                },
+                Entry {
+                    dest: 39,
+                    src: 0,
+                    amount: 15,
+                },
+            ]),
+        ])
+    }
+
+    #[rstest]
+    #[case(98, 35)]
+    #[case(50, 37)]
+    fn map_collection_test(
+        seed_to_soil_to_fertilizer: MapCollection,
+        #[case] input: u64,
+        #[case] expected: u64,
+    ) {
+        assert_eq!(seed_to_soil_to_fertilizer.map_to_dest(input), expected)
     }
 }
