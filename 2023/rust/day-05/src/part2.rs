@@ -1,4 +1,4 @@
-use indicatif::{ParallelProgressIterator, ProgressIterator, ProgressStyle};
+use indicatif::{ParallelProgressIterator, ProgressStyle};
 use nom::{
     character::complete::{self, newline, space1},
     multi::separated_list1,
@@ -23,35 +23,23 @@ fn seeds(input: &str) -> IResult<&str, Vec<(u64, u64)>> {
 #[tracing::instrument]
 pub fn process(input: &str) -> miette::Result<String, AocError> {
     let (remaining, seeds) = seeds.parse(input).unwrap();
-    let seeds: Vec<_> = seeds
-        .iter()
-        .progress()
-        .with_message("Collecting Seeds")
-        .with_style(
-            ProgressStyle::with_template(
-                "[{elapsed_precise}] {wide_bar} {pos}/{len} {msg}",
-            )
-            .unwrap(),
-        )
-        .with_finish(indicatif::ProgressFinish::Abandon)
-        .flat_map(|(start, amount)| (*start..*start + *amount))
-        .collect();
     let collection = maps
         .preceded_by(pair(newline, newline))
         .parse(remaining)
         .unwrap()
         .1;
+    // let seed_count = seeds.iter().fold(0, |acc, (_, amount)| acc + amount);
     let minimum_location = seeds
         .into_par_iter()
-        .progress()
-        .with_message("Calculating Locations")
-        .with_style(
-            ProgressStyle::with_template(
-                "[{elapsed_precise}/{duration_precise}] {wide_bar} {pos}/{len} {msg}",
-            )
-            .unwrap(),
-        )
-        .with_finish(indicatif::ProgressFinish::Abandon)
+        .flat_map(|(start, amount)| (start..start + amount))
+        // .progress_count(seed_count)
+        // .with_message("Calculating Locations")
+        // .with_style(
+        //     ProgressStyle::with_template(
+        //         "[{elapsed_precise}/{duration_precise}] {wide_bar} {pos}/{len} {msg}",
+        //     )
+        //     .unwrap(),
+        // )
         .map(|s| collection.map_to_dest(s))
         .min();
     Ok(minimum_location.unwrap().to_string())
