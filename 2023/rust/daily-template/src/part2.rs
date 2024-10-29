@@ -11,7 +11,6 @@ fn process_line(_line: &str) -> u32 {
 
 #[cfg(test)]
 mod tests {
-    use indoc::indoc;
     use rstest::rstest;
 
     use super::*;
@@ -19,8 +18,7 @@ mod tests {
     #[test]
     fn test_process() -> miette::Result<()> {
         todo!("Test not yet written");
-        let input = indoc! {r#"
-        "#};
+        let input = "";
 
         assert_eq!(process(input)?, "");
         Ok(())
