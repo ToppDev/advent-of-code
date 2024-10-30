@@ -4,26 +4,27 @@ use crate::custom_error::AocError;
 
 #[tracing::instrument]
 pub fn process(input: &str) -> miette::Result<String, AocError> {
-    let data = input
+    let (times, distances) = dbg!(input
         .lines()
         .map(|l| {
             let mut s = l.split_whitespace();
             s.next();
             s.collect_vec()
         })
-        .collect_vec();
+        .collect_tuple()
+        .unwrap());
 
-    Ok(format!(
-        "{}",
-        (0..data[0].len())
-            .map(|i| {
-                process_race(
-                    data[0][i].parse::<u32>().unwrap(),
-                    data[1][i].parse::<u32>().unwrap(),
-                )
-            })
-            .product::<u32>()
-    ))
+    Ok(times
+        .iter()
+        .zip(distances)
+        .map(|(time, distance)| {
+            process_race(
+                time.parse::<u32>().unwrap(),
+                distance.parse::<u32>().unwrap(),
+            )
+        })
+        .product::<u32>()
+        .to_string())
 }
 
 fn process_race(time: u32, distance: u32) -> u32 {

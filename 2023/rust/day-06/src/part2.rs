@@ -13,7 +13,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
         .collect_tuple()
         .unwrap();
 
-    Ok(format!("{}", process_race(time, distance)))
+    Ok(process_race(time, distance).to_string())
 }
 
 fn process_race(time: u64, distance: u64) -> u64 {
