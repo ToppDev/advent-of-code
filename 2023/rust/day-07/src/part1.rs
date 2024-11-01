@@ -1,5 +1,3 @@
-use std::{collections::HashMap, usize};
-
 use itertools::Itertools;
 
 use crate::custom_error::AocError;
@@ -67,14 +65,12 @@ impl Ord for Card {
 }
 
 fn determine_type(hand: &str) -> HandType {
-    let mut card_duplicates = HashMap::new();
+    let card_duplicates = hand.chars().counts();
 
-    for card in hand.chars() {
-        *card_duplicates.entry(card).or_insert(0) += 1;
-    }
     let cards = card_duplicates
         .iter()
-        .sorted_by(|a, b| Ord::cmp(&b.1, &a.1))
+        .sorted_by_key(|x| x.1) // Sort by count
+        .rev() // Descending
         .collect_vec();
 
     match cards.len() {

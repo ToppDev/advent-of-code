@@ -1,5 +1,3 @@
-use std::{collections::HashMap, usize};
-
 use itertools::Itertools;
 
 use crate::custom_error::AocError;
@@ -67,22 +65,13 @@ impl Ord for Card {
 }
 
 fn determine_type(hand: &str) -> HandType {
-    let mut card_duplicates = HashMap::new();
+    let card_duplicates = hand.chars().counts();
 
-    for card in hand.chars() {
-        *card_duplicates.entry(card).or_insert(0) += 1;
-    }
-    let mut cards: Vec<(&char, i32)> = card_duplicates
+    let mut cards = card_duplicates
         .iter()
-        .sorted_by(|a, b| {
-            match Ord::cmp(&b.1, &a.1) {
-                core::cmp::Ordering::Equal => {}
-                ord => return ord,
-            }
-
-            Ord::cmp(&Card(*b.0), &Card(*a.0))
-        })
-        .map(|x| (x.0, *x.1))
+        .sorted_by_key(|x| x.1) // Sort by count
+        .rev() // Descending
+        .map(|x| (x.0, *x.1)) // Make a copy of the counts to mutate later
         .collect_vec();
 
     // Add jokers to highest card and remove them
@@ -105,12 +94,12 @@ fn determine_type(hand: &str) -> HandType {
         2 => match (cards[0].1, cards[1].1) {
             (4, 1) => HandType::FourOfAKind,
             (3, 2) => HandType::FullHouse,
-            _ => panic!("All combinations with sum 5 should be covered"),
+            value => panic!("All combinations with sum 5 should be covered. Encountered `{value:?}`"),
         },
         3 => match (cards[0].1, cards[1].1, cards[2].1) {
             (3, 1, 1) => HandType::ThreeOfAKind,
             (2, 2, 1) => HandType::TwoPair,
-            _ => panic!("All combinations with sum 5 should be covered"),
+            value => panic!("All combinations with sum 5 should be covered. Encountered `{value:?}`"),
         },
         4 => HandType::OnePair,
         _ => HandType::HighCard,
