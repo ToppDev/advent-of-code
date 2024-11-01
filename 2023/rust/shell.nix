@@ -1,15 +1,10 @@
-{ callPackage,
-  rust-analyzer, rustfmt, clippy, llvmPackages,
-  just,
-  cargo-watch, cargo-generate, cargo-flamegraph, cargo-nextest,
+{
+  pkgs ? import <nixpkgs> { },
 }:
 
-let
-  mainPkg = callPackage ./default.nix { };
-in
-mainPkg.overrideAttrs (oa: {
-  nativeBuildInputs = [
-    # Additional rust tooling
+pkgs.mkShell {
+  nativeBuildInputs = with pkgs; [
+    # Dependencies that should only exist in the build environment.
     rust-analyzer
     rustfmt
     clippy
@@ -21,12 +16,5 @@ mainPkg.overrideAttrs (oa: {
     cargo-generate
     cargo-flamegraph
     cargo-nextest
-
-    # libGL libGLU # OpenGL
-    # vulkan-loader # Vulkan
-
-    # xorg.libxcb xorg.libXcursor xorg.libXi xorg.libXrandr # X11
-    # libxkbcommon wayland # Wayland
-    # trunk # WASM
-  ] ++ (oa.nativeBuildInputs or [ ]);
-})
+  ];
+}
