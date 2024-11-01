@@ -14,14 +14,35 @@
       ];
     in
     {
-      devShells = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
-          default = import ./shell.nix { inherit pkgs; };
-        }
-      );
+      devShells = forAllSystems (system: {
+        default =
+          let
+            pkgs = import nixpkgs {
+              inherit system;
+            };
+          in
+          pkgs.rustPlatform.buildRustPackage {
+            pname = "advent-of-code-2023";
+            version = "0.1.0";
+
+            src = ./.;
+            cargoLock.lockFile = ./Cargo.lock;
+
+            nativeBuildInputs = with pkgs; [
+              # Additional rust tooling
+              rust-analyzer
+              rustfmt
+              clippy
+              llvmPackages.bintools
+
+              just
+
+              cargo-watch
+              cargo-generate
+              cargo-flamegraph
+              cargo-nextest
+            ];
+          };
+      });
     };
 }
