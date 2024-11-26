@@ -56,11 +56,7 @@ Distance:  9  40  200";
     #[case(7, 9, 4)]
     #[case(15, 40, 8)]
     #[case(30, 200, 9)]
-    fn line_test(
-        #[case] time: u32,
-        #[case] distance: u32,
-        #[case] expected: u32,
-    ) {
+    fn line_test(#[case] time: u32, #[case] distance: u32, #[case] expected: u32) {
         assert_eq!(process_race(time, distance), expected)
     }
 }

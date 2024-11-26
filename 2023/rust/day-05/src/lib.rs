@@ -66,8 +66,7 @@ fn map(input: &str) -> IResult<&str, Map> {
 
 #[tracing::instrument(skip(input))]
 fn maps(input: &str) -> IResult<&str, MapCollection> {
-    let (input, collection) =
-        separated_list1(pair(newline, newline), map)(input)?;
+    let (input, collection) = separated_list1(pair(newline, newline), map)(input)?;
     // info!(?collection);
     Ok((input, MapCollection(collection)))
 }

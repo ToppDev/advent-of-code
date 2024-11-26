@@ -94,12 +94,16 @@ fn determine_type(hand: &str) -> HandType {
         2 => match (cards[0].1, cards[1].1) {
             (4, 1) => HandType::FourOfAKind,
             (3, 2) => HandType::FullHouse,
-            value => panic!("All combinations with sum 5 should be covered. Encountered `{value:?}`"),
+            value => {
+                panic!("All combinations with sum 5 should be covered. Encountered `{value:?}`")
+            }
         },
         3 => match (cards[0].1, cards[1].1, cards[2].1) {
             (3, 1, 1) => HandType::ThreeOfAKind,
             (2, 2, 1) => HandType::TwoPair,
-            value => panic!("All combinations with sum 5 should be covered. Encountered `{value:?}`"),
+            value => {
+                panic!("All combinations with sum 5 should be covered. Encountered `{value:?}`")
+            }
         },
         4 => HandType::OnePair,
         _ => HandType::HighCard,

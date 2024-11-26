@@ -18,8 +18,7 @@ struct Node<'a> {
 
 fn node(input: &str) -> IResult<&str, (&str, Node)> {
     let (input, node) = terminated(alpha1, tag(" = ("))(input)?;
-    let (input, (left, right)) =
-        separated_pair(alpha1, tag(", "), alpha1)(input)?;
+    let (input, (left, right)) = separated_pair(alpha1, tag(", "), alpha1)(input)?;
 
     Ok((input, (node, Node { left, right })))
 }
@@ -30,8 +29,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
     let instructions = lines.next().unwrap();
     lines.next(); // empty line
 
-    let nodes: HashMap<_, _> =
-        lines.map(|line| node(line).unwrap().1).collect();
+    let nodes: HashMap<_, _> = lines.map(|line| node(line).unwrap().1).collect();
 
     let mut current_node = "AAA";
     let steps = instructions
